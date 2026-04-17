@@ -16,7 +16,7 @@ const Write = () => {
   const [video, setVideo] = useState("");
   const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
-  console.log({currentUser})
+
 
   useEffect(() => {
     const addImg = () => {

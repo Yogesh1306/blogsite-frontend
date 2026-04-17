@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 const PostMenuActions = ({ post }) => {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  console.log(post);
+
 
   const { isPending, data: savedPosts } = useQuery({
     queryKey: ["savedPosts", currentUser?._id],
@@ -26,7 +26,7 @@ const PostMenuActions = ({ post }) => {
   const isSaved =
     savedPosts?.data?.posts.includes((p) => p === post.item._id) || false;
   const isFeatured = post?.item.isFeatured;
-  console.log(isFeatured);
+
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -70,7 +70,6 @@ const PostMenuActions = ({ post }) => {
       queryClient.invalidateQueries({ queryKey: ["post", post?.item.slug] });
     },
     onError: (error) => {
-      console.log({ error });
       toast.error(error.response);
     },
   });
@@ -96,7 +95,7 @@ const PostMenuActions = ({ post }) => {
   };
 
   const saveColor = colorMap[saveMutation.isPending][isSaved];
-  const featureColor = colorMap[saveMutation.isPending][isSaved];
+  const featureColor = colorMap[saveMutation.isPending][isFeatured];
 
   return (
     <div>

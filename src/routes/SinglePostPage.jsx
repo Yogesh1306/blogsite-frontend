@@ -21,7 +21,6 @@ const SinglePostPage = () => {
     queryFn: () => fetchPost(slug),
   });
 
-  console.log({ data });
 
   return (
     <>
