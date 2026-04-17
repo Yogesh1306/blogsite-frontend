@@ -16,7 +16,7 @@ A modern, full-stack blogging platform frontend built with React 19, Vite, and T
 | Routing | React Router v7 |
 | Rich Text Editor | React Quill New |
 | Image/Media | ImageKit React SDK |
-| Auth (Social) | Firebase v12 |
+| Auth (Social) | Google OAuth (custom `/users/google` endpoint) |
 | UI Components | Ant Design v6, Lucide React |
 | Notifications | React Toastify |
 | Time Formatting | timeago.js |
@@ -88,7 +88,6 @@ blogsite-frontend/
 - npm or yarn
 - A running backend server (see [blogsite-backend](https://github.com/Yogesh1306/blogsite-backend))
 - ImageKit account (for media uploads)
-- Firebase project (for social auth)
 
 ### Installation
 
@@ -111,17 +110,6 @@ Create a `.env` file in the root with the following variables:
 ```env
 VITE_BACKEND_URL=your_backend_url
 
-# ImageKit
-VITE_IK_URL_ENDPOINT=your_imagekit_url_endpoint
-VITE_IK_PUBLIC_KEY=your_imagekit_public_key
-
-# Firebase
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_firebase_app_id
 ```
 
 ### Running Locally
