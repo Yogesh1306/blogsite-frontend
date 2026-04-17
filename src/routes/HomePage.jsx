@@ -2,35 +2,39 @@ import { NavLink } from "react-router";
 import MainCategories from "../components/MainCategories";
 import FeaturedPosts from "../components/FeaturedPosts";
 import PostList from "../components/PostList";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import axios from "axios";
-import { loginFailure, loginStart, loginSuccess } from "../redux/userSlice";
+import { loginSuccess } from "../redux/userSlice";
+import { toast } from "react-toastify";
 
 const HomePage = () => {
   const dispatch = useDispatch();
-  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (!currentUser) {
-      const fetchUser = async () => {
-        dispatch(loginStart())
-        try {
-          const res = await axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/users/`,
-            { withCredentials: true },
-          );
-          if (res.data.user) {
-            dispatch(loginSuccess(res.data.user));
-          }
-        } catch (error){
-          dispatch(loginFailure())
-          console.log(error?.data?.message);
-        }
-      };
-      fetchUser();
+    const params = new URLSearchParams(globalThis.location.search);
+    const code = params.get("code");
+    if (code) {
+      globalThis.history.replaceState({}, "", "/");
+      axios
+        .post(
+          `${import.meta.env.VITE_BACKEND_URL}/users/exchange`,
+          { code },
+          { withCredentials: true },
+        )
+        .then(() => {
+          return axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/`, {
+            withCredentials: true,
+          });
+        })
+        .then((res) => {
+          dispatch(loginSuccess(res.data.user));
+        })
+        .catch(() => {
+          toast.error("Google login failed. please try again.");
+        });
     }
-  }, [dispatch, currentUser]);
+  }, [dispatch]);
 
   return (
     <div className="mt-4 flex flex-col gap-4 px-3 md:px-0">
@@ -48,7 +52,8 @@ const HomePage = () => {
             Discover Ideas, Stories, and Insights
           </h1>
           <p className="mt-5 text-sm md:text-xl md:w-160">
-            Read curated blogs and articles from diverse voices, featuring fresh perspectives on technology, culture, and everyday life.
+            Read curated blogs and articles from diverse voices, featuring fresh
+            perspectives on technology, culture, and everyday life.
           </p>
         </div>
         {/* animated button */}
