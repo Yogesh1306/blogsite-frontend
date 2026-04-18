@@ -1,26 +1,42 @@
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import {
-  NavLink,
-  useNavigate,
-  useSearchParams,
-} from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { loginFailure, loginStart, loginSuccess } from "../redux/userSlice";
 import { Button, Form, Input } from "antd";
 import { toast } from "react-toastify";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../../firebase";
 
 const LoginPage = () => {
   const [form] = Form.useForm();
-  const [params] = useSearchParams();
-  const error = params.get("error");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  if (error === "auth_failed") {
-    toast.error("Error while logging in using google! Please try again.");
-  }
+  const handleGoogleLogin = () => {
+    signInWithPopup(auth, provider)
+      .then(async (result) => {
+        const userDetails = {
+          email: result.user.email,
+          avatar: result.user.photoURL,
+          googleUserId: result.user.providerData[0].uid,
+        };
 
+        dispatch(loginStart());
+        const res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/users/google`,
+          userDetails,
+        );
+        dispatch(loginSuccess(res?.data?.user));
+        navigate("/");
+      })
+      .catch((error) => {
+        dispatch(loginFailure());
+        toast.error(
+          `${error.response ? "Error logging with google" : error?.response?.data?.message}`,
+        );
+      });
+  };
   const handleGithubLogin = () => {};
 
   const handleLogin = async (values) => {
@@ -45,7 +61,6 @@ const LoginPage = () => {
     navigate("/");
   };
 
-
   return (
     <div className="flex items-center justify-center h-[calc(100vh-80px)] px-10">
       <div className="flex flex-col gap-3 px-8 py-5 bg-white shadow rounded-2xl w-full sm:w-100">
@@ -58,9 +73,9 @@ const LoginPage = () => {
         {/* Sign-in methods: google, facebook, apple */}
         <div className="flex justify-center items-center gap-1 mt-3">
           {/* google */}
-          <a
+          <button
             className="flex-1 shadow rounded-sm cursor-pointer flex justify-center items-center p-2"
-            href={`${import.meta.env.VITE_BACKEND_URL}/users/google`}
+            onClick={handleGoogleLogin}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -72,7 +87,7 @@ const LoginPage = () => {
             >
               <path d="M15.545 6.558a9.4 9.4 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.7 7.7 0 0 1 5.352 2.082l-2.284 2.284A4.35 4.35 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.8 4.8 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.7 3.7 0 0 0 1.599-2.431H8v-3.08z" />
             </svg>
-          </a>
+          </button>
           {/* github */}
           <button
             className="flex-1 shadow rounded-sm cursor-pointer flex justify-center items-center p-2"
