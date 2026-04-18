@@ -5,7 +5,7 @@ import { loginFailure, loginStart, loginSuccess } from "../redux/userSlice";
 import { Button, Form, Input } from "antd";
 import { toast } from "react-toastify";
 import { signInWithPopup } from "firebase/auth";
-import { auth, provider } from "../../firebase";
+import { auth, githubProvider, googleProvider } from "../../firebase";
 
 const LoginPage = () => {
   const [form] = Form.useForm();
@@ -14,7 +14,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
-    signInWithPopup(auth, provider)
+    signInWithPopup(auth, googleProvider)
       .then(async (result) => {
         const userDetails = {
           email: result.user.email,
@@ -37,7 +37,29 @@ const LoginPage = () => {
         );
       });
   };
-  const handleGithubLogin = () => {};
+  const handleGithubLogin = () => {
+    signInWithPopup(auth, githubProvider).then(async (result) => {
+      const userDetails = {
+          email: result.user.email,
+          avatar: result.user.photoURL,
+          githubUserId: result.user.providerData[0].uid,
+        };
+
+        dispatch(loginStart());
+        const res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/users/github`,
+          userDetails,
+        );
+        dispatch(loginSuccess(res?.data?.user));
+        navigate("/");
+      })
+      .catch((error) => {
+        dispatch(loginFailure());
+        toast.error(
+          `${error.response ? "Error logging with github" : error?.response?.data?.message}`,
+        );
+      });
+  };
 
   const handleLogin = async (values) => {
     const userDetails = {
