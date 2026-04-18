@@ -2,39 +2,8 @@ import { NavLink } from "react-router";
 import MainCategories from "../components/MainCategories";
 import FeaturedPosts from "../components/FeaturedPosts";
 import PostList from "../components/PostList";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
-import axios from "axios";
-import { loginSuccess } from "../redux/userSlice";
-import { toast } from "react-toastify";
 
 const HomePage = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const params = new URLSearchParams(globalThis.location.search);
-    const code = params.get("code");
-    if (code) {
-      globalThis.history.replaceState({}, "", "/");
-      axios
-        .post(
-          `${import.meta.env.VITE_BACKEND_URL}/users/exchange`,
-          { code },
-          { withCredentials: true },
-        )
-        .then(() => {
-          return axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/`, {
-            withCredentials: true,
-          });
-        })
-        .then((res) => {
-          dispatch(loginSuccess(res.data.user));
-        })
-        .catch(() => {
-          toast.error("Google login failed. please try again.");
-        });
-    }
-  }, [dispatch]);
 
   return (
     <div className="mt-4 flex flex-col gap-4 px-3 md:px-0">
